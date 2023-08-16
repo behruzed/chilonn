@@ -1,0 +1,97 @@
+const { title } = require("process")
+const bcrypt = require('bcrypt')
+const Ucer = require('../../model/Role')
+
+exports.index = async (req, res) => {
+    const owe = "Chilon HVLP-15";
+    let data = await Ucer.find({ subject: "position", parent: owe })
+    if (data) {
+        res.json({ title: "All items", data })
+        console.log(owe)
+    }
+}
+exports.show = async (req, res) => {
+    let data = await Ucer.findById(req.params.id)
+    if (data) {
+        res.json({ title: "Special item", data })
+    }
+}
+exports.create = async (req, res) => {
+    let { firstName, lastName, email, status, password, subject, name, nameId, norma, type, group, partiyaName, partiyaNameFolder, commentByOpener, commentByCloser, commentByArchiver, openedBy, openedData, closedBy, closedData, archivedBy, archivedData, company } = req.body
+    console.log(req.body);
+    let data = await Ucer.findOne({ firstName })
+    if (!data) {
+        if (firstName && lastName && email && status && password && subject && name && nameId && norma && type && group && partiyaName && partiyaNameFolder && commentByOpener && commentByCloser && commentByArchiver && openedBy && openedData && closedBy && closedData && archivedBy && archivedData, company) {
+            try {
+                let hash = await bcrypt.hash(password, 10)
+                let item = new Ucer({
+                    firstName: 'none',
+                    lastName: 'none',
+                    email: 'none',
+                    status,
+                    password: 'none',
+                    subject: 'position',
+                    name,
+                    nameId,
+                    norma,
+                    type,
+                    group,
+                    partiyaName,
+                    partiyaNameFolder,
+                    commentByOpener,
+                    commentByCloser,
+                    commentByArchiver,
+                    openedBy,
+                    openedData,
+                    closedBy,
+                    closedData,
+                    archivedBy,
+                    archivedData,
+                    company,
+                    parent: name,
+                })
+                item.save()
+                    .then(data => {
+                        if (data) {
+                            res.json({ title: "Продукт добавлен в систему✅", data: data })
+                        }
+                    })
+            } catch (e) {
+                res.json({ title: "Error", e })
+            }
+        }
+        else {
+            res.json({ title: "Enter all data for item!!!" })
+        }
+    } else if (data) {
+        res.json({ title: "This item already exist" })
+    }
+}
+exports.edit = async (req, res) => {
+    let { firstName, lastName, email, status, password, subject, name, nameId, norma, type, group, partiyaName, partiyaNameFolder, commentByOpener, commentByCloser, commentByArchiver, openedBy, openedData, closedBy, closedData, archivedBy, archivedData, company } = req.body
+    if (firstName || lastName || email || status || password || subject || name || nameId || norma || type || group || partiyaName || partiyaNameFolder || commentByOpener || commentByCloser || commentByArchiver || openedBy || openedData || closedBy || closedData || archivedBy || archivedData, company) {
+        if (password) {
+            let hash = await bcrypt.hash(password, 10)
+            let data = await Ucer.findByIdAndUpdate(req.params.id, { ...req.body, password: hash })
+            if (data) {
+                res.json({ title: "Информация о продукте была изменена✅", data })
+            }
+        } else {
+            let data = await Ucer.findByIdAndUpdate(req.params.id, { ...req.body })
+            if (data) {
+                res.json({ title: "Информация о продукте была изменена✅", data })
+            }
+        }
+    }
+    else {
+        res.json({ title: "Data is notfound for item!!!" })
+    }
+}
+exports.remove = async (req, res) => {
+    let data = await Ucer.findByIdAndDelete(req.params.id)
+    if (data) {
+        res.json({ title: "Продукт был удален❌" })
+    } else {
+        res.json({ title: `${req.params.id} not found` });
+    }
+}
